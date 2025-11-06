@@ -7,8 +7,7 @@ blueprint:
       name: XH-SY-04Z Switch
       description: Tuya 4-Button Wireless Switch
       selector:
-        entity:
-          domain: sensor
+        device:
           integration: mqtt
     button_one_short_press:
       name: Button 1 - Single Press
@@ -82,21 +81,20 @@ blueprint:
       default: []
       selector:
         action: null
-  source_url: https://raw.githubusercontent.com/CHGitHack/XH-SY-04Z-Blueprint/refs/heads/main/XH-SY-04Z.yaml
 mode: single
 max_exceeded: silent
 variables:
   command: "{{ trigger.payload }}"
   topic: "{{ trigger.topic }}"
-  switch_name: !input "switch"
-  deviceName: "{{ state_attr(switch_name, 'friendly_name') }}"
+  switch_id: !input "switch"
+  deviceName: "{{ device_attr(switch_id, 'name') }}"
 trigger:
   - platform: mqtt
     topic: zigbee2mqtt/+/action
 action:
   - choose:
       - conditions:
-          - "{{ topic.split('/')[1] == (deviceName or '') }}"
+          - "{{ topic.split('/')[1].replace('/', '') == deviceName }}"
         sequence:
           - choose:
               - conditions:
